@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Regenerate the computed figures for the PNAS submission.
+"""Regenerate the computed figures.
 
 Each figure script is run with `src/` as the working directory (they resolve
 their input data as "../data/..." and write their PNG into the CWD), then the
@@ -7,7 +7,7 @@ resulting PNG is moved into `figures/`.
 
 Usage:
     python3 make_figures.py            # build all figures
-    python3 make_figures.py results_a methods_a  # build a subset, by key
+    python3 make_figures.py fig03a fig05a  # build a subset, by key
 """
 
 import os
@@ -21,19 +21,25 @@ OUT = os.path.join(ROOT, "figures")
 
 # key -> (script in src/, PNG the script writes)
 #
-# Keys follow the panel each figure occupies in the submission:
-#   results_a / results_b  -> Fig. \ref{fig:empirical_results}, panels (a) and (b)
-#   methods_a / methods_b  -> Methods Fig. \ref{fig:tests}, panels (a) and (b)
+# Keys are the figure labels used in the paper:
+#   fig03a / fig03b  -> Fig. 3, panels (a) and (b): empirical results
+#   fig05a / fig05b  -> Fig. 5, panels (a) and (b): methods
 FIGURES = {
-    "results_a": ("bar_compress_5x7c_thresh.py", "compress_5x7c_thresh.png"),
-    "results_b": (
-        "no_need_to_know_hash5_thresh.py",
-        "no_need_to_know_hash_5_thresh.png",
+    "fig03a": (
+        "fig03a_empirical_results_targeted_queries.py",
+        "fig03a_empirical_results_targeted_queries.png",
     ),
-    "methods_a": ("plot2_count.py", "methods_targeted_queries.png"),
-    "methods_b": (
-        "alice_does_not_know_what_bob_knows.py",
-        "methods_no_need_to_know.png",
+    "fig03b": (
+        "fig03b_empirical_results_no_need_to_know.py",
+        "fig03b_empirical_results_no_need_to_know.png",
+    ),
+    "fig05a": (
+        "fig05a_methods_targeted_queries.py",
+        "fig05a_methods_targeted_queries.png",
+    ),
+    "fig05b": (
+        "fig05b_methods_no_need_to_know.py",
+        "fig05b_methods_no_need_to_know.png",
     ),
 }
 

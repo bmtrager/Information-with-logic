@@ -66,7 +66,6 @@ ax.tick_params(axis='both', which='major', labelsize=16)
 plt.xticks(fontsize=16)
 plt.yticks(fontsize=16)
 #plt.show()
-#plt.savefig('alice_does_not_know_what_bob_knows.png',dpi=300)
-plt.savefig('methods_no_need_to_know.png',dpi=300,bbox_inches='tight')
+plt.savefig('fig05b_methods_no_need_to_know.png',dpi=300,bbox_inches='tight')
 
 
