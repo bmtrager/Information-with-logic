@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite the accompanying paper below."
+title: "PNAS figure code"
+authors:
+  - family-names: Lastras
+    given-names: Luis A.
+  # TODO: add any additional software authors here, in order.
+license: Apache-2.0
+# TODO: set the public repository URL once published.
+# repository-code: "https://github.com/<owner>/<repo>"
+preferred-citation:
+  type: article
+  # TODO: fill in the final paper title.
+  title: "TODO: paper title"
+  authors:
+    - family-names: Lastras
+      given-names: Luis A.
+    # TODO: add the paper's co-authors, in order.
+  journal: "Proceedings of the National Academy of Sciences"
+  year: 2026
+  # TODO: add the DOI once assigned, e.g. 10.1073/pnas.XXXXXXXXXXX
+  # doi: "10.1073/pnas.XXXXXXXXXXX"

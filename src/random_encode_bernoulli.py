@@ -1,109 +1,51 @@
-import numpy as np
-import math
-from gf2elim import *
+"""Bernoulli random linear code over GF(2).
 
-# v is a binary integer vector
-# p is prob of 1
-# returns representation of v as combination of rows of random matrix
-# needs common seed with decoder, np.random.seed(xxx)
-    
-def strip_tail_zeros (v) :
+The partition encoder represents the sender's zero pattern as a linear
+combination of rows drawn from a random Bernoulli(``p``) matrix, restricted to
+the coordinates the receiver cares about. ``random_encode_select`` returns the
+combining coefficients, whose length is the code word size priced by the
+partition code.
+"""
+
+import math
+
+import numpy as np
+
+from gf2elim import gf2elim_rels
+
+
+def strip_tail_zeros(v):
+    """Drop trailing zeros from ``v`` (the code word carries no information)."""
     nz = np.nonzero(v)[0]
-    if nz.size > 0: 
-        v = v[0:nz[-1]+1]
-#        print("strip size = " + str(v.size))
+    if nz.size > 0:
+        v = v[0:nz[-1] + 1]
     return v
 
-def random_encode(v, p, s):
-
-    np.random.seed(s)
-#    pad = int(v.size * .05)
-    pad = math.ceil(v.size * .05)
-    M = np.zeros([0,v.size], dtype=np.uint8)
-    for x in range(v.size + pad) :
-        M = np.vstack([M, np.random.binomial(1, p, size=v.size)])
-
-    while True :
-
-        Mv = np.vstack([M, v])
-        n,m = Mv.shape
-
-#        Mv = gf2elim( np.hstack([Mv, np.eye(n, dtype=np.uint8)]))
-        Mv = gf2elim_rels(Mv)
-
-        if not np.any(Mv[n-1,0:m]) and Mv[n-1, n+m-1] == 1:
-            print(Mv)
-            return strip_tail_zeros(Mv[n-1, m:n+m-1])
-
-        print("adding " + str(pad) + " rows")
-        for x in range(pad):
-            M = np.vstack([M, np.random.binomial(1, p, size=v.size)])
-
-    return np.zeros(0)
-
-# ind is a list of columns to restrict to
 
 def random_encode_select(v, ind, p, s):
+    """Encode ``v`` restricted to columns ``ind`` against a seeded random matrix.
 
+    Seeds the RNG with ``s`` so the decoder can regenerate the same matrix,
+    draws Bernoulli(``p``) rows, and reduces ``[M; v]`` over GF(2) until the
+    appended row lands in the span of ``M`` on the restricted columns. Extra
+    rows are added until a solution exists. Returns the combining coefficients.
+    """
     np.random.seed(s)
 
-    M = np.zeros([0,v.size], dtype=np.uint8)
-#    pad = int(len(ind)*.05)
-    pad = math.ceil(len(ind)*.05)
-#    print("pad = " + str(pad))
-    for x in range(len(ind)+pad) :
+    M = np.zeros([0, v.size], dtype=np.uint8)
+    pad = math.ceil(len(ind) * .05)
+    for x in range(len(ind) + pad):
         M = np.vstack([M, np.random.binomial(1, p, size=v.size)])
 
-#    print("ind size = " + str(len(ind)))
-    while True :
-
-#        print ("M.shape = " + str(M.shape))
+    while True:
         Mv = np.vstack([M, v])
-        Mv = Mv[:,ind]
-        n,m = Mv.shape
+        Mv = Mv[:, ind]
+        n, m = Mv.shape
 
-#        Mv = gf2elim( np.hstack([Mv, np.eye(n, dtype=np.uint8)]))
         Mv = gf2elim_rels(Mv)
 
-        if not np.any(Mv[n-1,0:m]) and Mv[n-1, n+m-1] == 1:
-#            print("final size = " + str(n-1))
-            return strip_tail_zeros(Mv[n-1, m:n+m-1])
+        if not np.any(Mv[n - 1, 0:m]) and Mv[n - 1, n + m - 1] == 1:
+            return strip_tail_zeros(Mv[n - 1, m:n + m - 1])
 
-        print("adding " + str(pad) + " rows")
-        for x in range(pad) :
+        for x in range(pad):
             M = np.vstack([M, np.random.binomial(1, p, size=v.size)])
-
-    return np.zeros(0)
-
-# w is a binary vector of matrix coefficients
-# n is size of vector to be generated
-# needs common seed with encoder, np.random.seed(xxx)
-     
-def random_decode(w, n, p, s):
-
-    np.random.seed(s)
-    M = np.zeros([0,n], dtype=np.uint8)
-
-    for x in range(w.size) :
-        M = np.vstack([M, np.random.binomial(1,p, size = n)])
-
-    return np.mod(np.dot(w,M),2)
-
-#p = .7
-#v = np.array([1,0,1,1,0,1,1,1])
-#s = 2334235
-#w = random_encode(v, p, s)
-#print(v)
-#print(w)
-#print(random_decode(w, v.size, p, s))
-
-#ind = [2,3,4,7]
-#ww = random_encode_select(v, ind, p, s)
-#vv = random_decode(ww, v.size, p, s)
-#print (ww)
-#print (vv)
-#print (v[ind])
-#print (vv[ind])
-
-
-      
