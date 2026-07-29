@@ -16,6 +16,10 @@ PNGs are written to `figures/`. To build a subset, pass figure keys:
 python3 make_figures.py results_a methods_a
 ```
 
+This reads the precomputed summaries in `data/` and takes about 2 seconds. The
+raw test sets those summaries came from are also included; re-deriving them is a
+separate, much slower step — see [Regenerating the summaries](#regenerating-the-summaries).
+
 ## What reproduces
 
 Four of the eight PNGs in `content/paper-PNAS` are matplotlib output and are
@@ -30,9 +34,16 @@ fully reproducible from this repository:
 
 Three of the four are byte-for-byte identical to the submitted PNGs when built
 with matplotlib 3.10.0. `methods_targeted_queries.png` is visually identical but
-not byte-identical: the submitted copy was rendered with matplotlib 3.9.4, and
-the difference is confined to font rasterization and antialiasing (same image
-dimensions, ~0.5% of pixels differing at glyph edges).
+not byte-identical, and pinning a matplotlib version does not change that: the
+submitted copy carries a matplotlib 3.9.4 tag, but building under 3.9.4 yields a
+third distinct hash while leaving the pixel difference unchanged, so the
+matplotlib version is not the cause. The residual difference is sub-pixel
+rendering jitter — same image dimensions (1516x1815), ~0.59% of pixels differing,
+spread over both glyph edges and the plotted curves/markers. It is cosmetic
+rather than a data difference: per-color pixel counts match to within 16 px of
+~2200 and mark centroids shift by only ~1-3 px out of 1815. The most likely
+remaining variable is the host font stack (the submitted PNG was rendered on a
+different machine); reproducing it exactly is not expected.
 
 Note that the paper's LaTeX embeds the `.pdf` version of each figure; the `.png`
 files are the same plots in raster form.
@@ -57,8 +68,8 @@ in their original drawing tool, not regenerated from here.
 
 ```
 make_figures.py   driver: runs each plot script and collects its PNG
-src/              plot scripts and the encoder/analysis modules they import
-data/             precomputed per-experiment summary JSON (inputs to the plots)
+src/              plot scripts, encoder/analysis modules, and the summary drivers
+data/             raw per-experiment test sets + the summary JSON derived from them
 figures/          build output
 ```
 
@@ -82,23 +93,51 @@ Supporting modules imported by the above:
 - `gf2elim.py` — GF(2) Gaussian elimination
 - `compress_data_concat_new_nocnf.py` — gzip/bz2/lzma baselines
 
-Also included for provenance: `run_compress.py` and `run_compress_parallel.py`,
-the drivers that produced the `data/` summaries from the raw test sets.
+Summary drivers — these rebuild `data/*_compressed_count.json` from the raw test
+sets (see [Regenerating the summaries](#regenerating-the-summaries)):
+
+- `run_compress.py` — processes all 12 test sets sequentially
+- `run_compress_parallel.py` — same, one process per test set
 
 ### `data/`
 
-Twelve `test_set_<p_s>-<p_q>-<p_r>_compressed_count.json` files — the summary
-statistics the plots consume, at `p_s = 0.075`, `p_r = 0.5`, and the twelve
-values of `p_q` the figures sample.
+Two files per experiment, for `p_s = 0.075`, `p_r = 0.5`, and the twelve values of
+`p_q` the figures sample (24 files total):
 
-These are derived artifacts. The raw `test_set_*.json` inputs they were computed
-from total ~2.7 GB and are not included here; they live in `experiments/data/` in
-the `information-in-logic` repository. Regenerating a summary from raw data uses
-`run_compress.py` (or `run_compress_parallel.py`), which expects the raw test
-sets in `data/`.
+- `test_set_<p_s>-<p_q>-<p_r>.json` — the raw test set (24-34 MB each, 369 MB
+  total). Copied from `experiments/data/` in the `information-in-logic`
+  repository and verified identical by checksum.
+- `test_set_<p_s>-<p_q>-<p_r>_compressed_count.json` — the summary statistics the
+  plot scripts actually consume, derived from the raw set above.
+
+Both levels are committed, so the chain from raw data to figure is reproducible
+end to end.
+
+#### Regenerating the summaries
+
+```bash
+cd src
+python3 run_compress_parallel.py    # all 12, one process each
+python3 run_compress.py             # all 12, sequentially
+```
+
+Both drivers glob `../data/*0.5.json` and write each
+`<name>_compressed_count.json` **next to its input, overwriting in place**. Back
+up `data/*_compressed_count.json` first if you want to compare before/after.
+
+This step is far slower than plotting: about 7 minutes per file single-threaded
+(~1.5 h for all 12 sequentially; roughly the cost of the slowest file when run in
+parallel), against ~2 seconds for all four figures. The plots do not need it —
+run it only to re-derive the summaries from raw data.
+
+Verified deterministic: regenerating
+`test_set_0.075-0.125-0.5_compressed_count.json` from its raw input reproduces
+the committed summary byte-for-byte.
 
 ## Requirements
 
-Python 3 with numpy and matplotlib (see `requirements.txt`). Verified with
-Python 3.13, numpy 2.2.0, matplotlib 3.10.0. Install matplotlib 3.9.4 to
-reproduce `methods_targeted_queries.png` byte-for-byte.
+Python 3 with numpy and matplotlib (see `requirements.txt`). Verified end-to-end
+with Python 3.13.1, numpy 2.2.0, matplotlib 3.10.0: all four figures build in
+about 2 seconds, and three are byte-identical to the submitted PNGs. Under this
+configuration `methods_targeted_queries.png` differs cosmetically only (see
+"What reproduces" above); no dependency pin is known to make it byte-identical.
