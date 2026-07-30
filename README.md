@@ -60,7 +60,7 @@ Supporting modules imported by the above:
 - `random_encode_bernoulli.py` — Bernoulli random encoder
 - `elias_delta.py` — Elias delta integer code
 - `gf2elim.py` — GF(2) Gaussian elimination
-- `compress_data_concat_new_nocnf.py` — gzip/bz2/lzma baselines
+- `tnf_baselines.py` — gzip/bz2/lzma baselines
 
 Summary drivers — these rebuild `data/*_compressed_count.json` from the raw test
 sets (see [Regenerating the summaries](#regenerating-the-summaries)):

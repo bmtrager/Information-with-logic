@@ -33,11 +33,10 @@ z = lam(ps, pr - ps)
 
 fig, ax = plt.subplots()
 
-z3 = pr
 ax.plot(pr, z, 'k', label=r'$\Lambda(p_s,p_r-p_s)$')
 z22 = np.ones(len(pr))*lam(ps, 1-ps)
 ax.plot(pr, z22, ':g', lw=0.75, label=r'$\Lambda(p_s, 1 - p_s)$')
-ax.plot(pr, z3, ':b', lw=0.75, label='Linear code')
+ax.plot(pr, pr, ':b', lw=0.75, label='Linear code')
 
 pts1 = get_data_field('hash_sq_mean_normalized', pql1)
 pts2 = get_data_field('hash_sq_mean_normalized', pql2)

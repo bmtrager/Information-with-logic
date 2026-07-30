@@ -54,7 +54,7 @@ ax.axhline(y=1, color='tab:grey', linestyle='--', label=r'New fundamental limit 
 
 for ((attribute, measurement), col) in zip(compress_sizes.items(), mycolors):
     offset = width * multiplier
-    rects = ax.bar(x + offset, normalize(measurement), width, label=attribute, color=col)
+    ax.bar(x + offset, normalize(measurement), width, label=attribute, color=col)
     multiplier += 1
 
 

@@ -17,7 +17,7 @@ import json
 
 from partition_encode import partition_encode_restrict_size
 from enumerative import enum_total_size
-from compress_data_concat_new_nocnf import compress_data
+from tnf_baselines import compress_data
 from random_hash_encode import hash_encode_null_space_decode
 
 # Shared RNG seed so encoder and decoder build the same random matrices; fixed
@@ -37,51 +37,47 @@ def getvars(data):
     return data['Variables']
 
 
-def get_test_set(data, nset):
-    return data
+def get_test_set_num(data):
+    return data['Test Set #']
 
 
-def get_test_set_num(data, nset):
-    return get_test_set(data, nset)['Test Set #']
+def number_cases(data):
+    return len(data['Test Cases'])
 
 
-def number_cases(data, nset):
-    return len(get_test_set(data, nset)['Test Cases'])
+def get_receiver_prob(data):
+    return data['p_receiver']
 
 
-def get_receiver_prob(data, nset):
-    return get_test_set(data, nset)['p_receiver']
+def get_sender_prob(data):
+    return data['p_sender']
 
 
-def get_sender_prob(data, nset):
-    return get_test_set(data, nset)['p_sender']
+def get_query_prob(data):
+    return data['p_query']
 
 
-def get_query_prob(data, nset):
-    return get_test_set(data, nset)['p_query']
+def get_test_case(data, ncase):
+    return data['Test Cases'][ncase]
 
 
-def get_test_case(data, nset, ncase):
-    return get_test_set(data, nset)['Test Cases'][ncase]
-
-
-def compute_restrict_prob(data, nset):
+def compute_restrict_prob(data):
     """Bernoulli parameter for the random code, restricted to the receiver kernel."""
-    p_r = get_receiver_prob(data, nset)
-    p_s = get_sender_prob(data, nset)
-    p_q = get_query_prob(data, nset)
+    p_r = get_receiver_prob(data)
+    p_s = get_sender_prob(data)
+    p_q = get_query_prob(data)
     p_qc = p_r - p_q
     return p_s / (p_s + p_qc)
 
 
-def process_case_size(data, nset, ncase):
+def process_case_size(data, ncase):
     """Encoded size of one test case under each code, as a dict of bit counts."""
     vars = getvars(data)
     N = pow(2, len(vars))
-    case = get_test_case(data, nset, ncase)
+    case = get_test_case(data, ncase)
     sender_zeros = case['Sender Zeroes']
     receiver_zeros = case['Receiver Zeroes']
-    if get_sender_prob(data, nset) == get_query_prob(data, nset):
+    if get_sender_prob(data) == get_query_prob(data):
         query_zeros = sender_zeros
     else:
         query_zeros = case['Query Zeroes']
@@ -90,33 +86,33 @@ def process_case_size(data, nset, ncase):
     qzer = szeros_to_ints(query_zeros)
     rzer = szeros_to_ints(receiver_zeros)
 
-    prob = compute_restrict_prob(data, nset)
+    prob = compute_restrict_prob(data)
 
     return dict(hash_sq=hash_encode_null_space_decode(szer, qzer, N, HASH_SLACK, seed),
                 hash_sr=hash_encode_null_space_decode(szer, rzer, N, HASH_SLACK, seed),
                 partition=partition_encode_restrict_size(szer, qzer, rzer, N, prob, seed),
                 enum_sender=enum_total_size(len(rzer), len(szer)),
-                enum_sender_only=enum_total_size(2**10, len(szer)),
+                enum_sender_only=enum_total_size(N, len(szer)),
                 enum_query_compl=enum_total_size(len(rzer), len(rzer) - len(qzer)))
 
 
-def process_case_size_rang(data, nset, rang):
-    return [process_case_size(data, nset, i) for i in rang]
+def process_case_size_rang(data, rang):
+    return [process_case_size(data, i) for i in rang]
 
 
-def mean(list):
-    return sum(list) / len(list)
+def mean(values):
+    return sum(values) / len(values)
 
 
-def mean_skip_zero(list):
+def mean_skip_zero(values):
     """Mean that ignores zero entries in the denominator (skips empty cases)."""
-    return sum(list) / len([i for i in list if i != 0])
+    return sum(values) / len([i for i in values if i != 0])
 
 
-def process_full_set_size(data, nset):
+def process_full_set_size(data):
     """Aggregate per-case sizes across a test set into mean and normalized stats."""
     N = pow(2, len(getvars(data)))
-    encoder_size_list = process_case_size_rang(data, nset, range(number_cases(data, nset)))
+    encoder_size_list = process_case_size_rang(data, range(number_cases(data)))
     hash_sq_sizes = [d['hash_sq'] for d in encoder_size_list]
     hash_sq_mean = mean(hash_sq_sizes)
     hash_sr_sizes = [d['hash_sr'] for d in encoder_size_list]
@@ -130,11 +126,11 @@ def process_full_set_size(data, nset):
     enum_query_compl_sizes = [d['enum_query_compl'] for d in encoder_size_list]
     enum_query_compl_mean = mean_skip_zero(enum_query_compl_sizes)
 
-    return dict(test_set=get_test_set_num(data, nset),
+    return dict(test_set=get_test_set_num(data),
                 num_vars=len(getvars(data)),
-                p_receiver=get_receiver_prob(data, nset),
-                p_sender=get_sender_prob(data, nset),
-                p_query=get_query_prob(data, nset),
+                p_receiver=get_receiver_prob(data),
+                p_sender=get_sender_prob(data),
+                p_query=get_query_prob(data),
                 hash_sq_mean=hash_sq_mean,
                 hash_sq_mean_normalized=hash_sq_mean / N,
                 hash_sr_mean=hash_sr_mean,
@@ -158,7 +154,7 @@ def process_compressed(name):
     with open(name + ".json", "r") as read_file:
         data = json.load(read_file)
     with open(name + "_compressed_count.json", "w") as outfile:
-        json.dump(process_full_set_size(data, 0) | compress_data(data), outfile)
+        json.dump(process_full_set_size(data) | compress_data(data), outfile)
 
 
 def get_compressed_data(fn, ps, pq, pr):
