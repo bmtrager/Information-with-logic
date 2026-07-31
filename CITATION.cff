@@ -2,20 +2,34 @@ cff-version: 1.2.0
 message: "If you use this software, please cite the accompanying paper below."
 title: "PNAS figure code"
 authors:
+  - family-names: Trager
+    given-names: Barry M.
+  - family-names: Lenchner
+    given-names: Jonathan
   - family-names: Lastras
     given-names: Luis A.
-  # TODO: add any additional software authors here, in order.
 license: Apache-2.0
-# TODO: set the public repository URL once published.
-# repository-code: "https://github.com/<owner>/<repo>"
+repository-code: "https://github.com/bmtrager/Information-with-logic"
 preferred-citation:
   type: article
-  # TODO: fill in the final paper title.
-  title: "TODO: paper title"
+  title: "Fundamental limits incorporating logical reasoning into Shannon's information theory"
   authors:
     - family-names: Lastras
       given-names: Luis A.
-    # TODO: add the paper's co-authors, in order.
+    - family-names: Lenchner
+      given-names: Jonathan
+    - family-names: Trager
+      given-names: Barry M.
+    - family-names: Szpankowski
+      given-names: Wojciech
+    - family-names: Squillante
+      given-names: Mark S.
+    - family-names: Wu
+      given-names: Chai Wah
+    - family-names: Fagin
+      given-names: Ronald
+    - family-names: Gray
+      given-names: Alexander
   journal: "Proceedings of the National Academy of Sciences"
   year: 2026
   # TODO: add the DOI once assigned, e.g. 10.1073/pnas.XXXXXXXXXXX
