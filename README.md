@@ -1,6 +1,10 @@
 # PNAS figure code
 
-Code and input data that generate the four computed figures in the paper.
+Code and input data that generate the four computed figures in the paper
+"Fundamental limits incorporating logical reasoning into Shannon's information
+theory" by L. A. Lastras, J. Lenchner, B. M. Trager, W. Szpankowski, M. S.
+Squillante, C. W. Wu, R. Fagin, and A. Gray, *Proceedings of the National
+Academy of Sciences* (2026). See [Citation](#citation) below.
 
 ## Quick start
 
@@ -101,3 +105,15 @@ reproduces the committed file byte-for-byte.
 
 Python 3 with numpy and matplotlib (see `requirements.txt`). Verified end to end
 with Python 3.13.1, numpy 2.2.0, matplotlib 3.10.0.
+
+## Citation
+
+If you use this code, please cite the accompanying paper:
+
+> L. A. Lastras, J. Lenchner, B. M. Trager, W. Szpankowski, M. S. Squillante,
+> C. W. Wu, R. Fagin, and A. Gray, "Fundamental limits incorporating logical
+> reasoning into Shannon's information theory," *Proceedings of the National
+> Academy of Sciences*, 2026. DOI: _to be added_.
+
+Machine-readable metadata is in [`CITATION.cff`](CITATION.cff); the DOI will be
+filled in there once assigned.
