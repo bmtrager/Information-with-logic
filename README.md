@@ -1,9 +1,9 @@
-# Fundamental limits incorporating logical reasoning into Shannon's information theory
+# Figure code and input data for "Fundamental limits incorporating logical reasoning into Shannon's information theory"
 
-Figure code and input data for the paper by L. A. Lastras, J. Lenchner, B. M.
-Trager, W. Szpankowski, M. S. Squillante, C. W. Wu, R. Fagin, and A. Gray,
-*Proceedings of the National Academy of Sciences* (2026). This repository
-generates the four computed figures. See [Citation](#citation) below.
+Accompanies the paper by L. A. Lastras, J. Lenchner, B. M. Trager, W.
+Szpankowski, M. S. Squillante, C. W. Wu, R. Fagin, and A. Gray, *Proceedings of
+the National Academy of Sciences* (2026). This repository generates the four
+computed figures. See [Citation](#citation) below.
 
 ## Quick start
 
