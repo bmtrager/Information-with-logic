@@ -15,9 +15,9 @@ PNGs are written to `figures/`. To build a subset, pass figure keys:
 python3 make_figures.py fig03a fig05a
 ```
 
-This reads the precomputed summaries in `data/` and takes about 2 seconds. The
-raw test sets those summaries came from are also included; re-deriving them is a
-separate, much slower step — see [Regenerating the summaries](#regenerating-the-summaries).
+This reads the precomputed summaries in `data/`. The raw test sets those
+summaries came from are also included; re-deriving them is a separate step — see
+[Regenerating the summaries](#regenerating-the-summaries).
 
 ## Figures
 
@@ -93,15 +93,11 @@ Both drivers glob `../data/*0.5.json` and write each
 `<name>_compressed_count.json` **next to its input, overwriting in place**. Back
 up `data/*_compressed_count.json` first if you want to compare before/after.
 
-This step is far slower than plotting: about 7 minutes per file single-threaded
-(~1.5 h for all 12 sequentially; roughly the cost of the slowest file when run in
-parallel), against ~2 seconds for all four figures. The plots do not need it —
-run it only to re-derive the summaries from raw data. Regeneration is
-deterministic: rebuilding a summary from its raw input reproduces the committed
-file byte-for-byte.
+The plots do not need this step — run it only to re-derive the summaries from raw
+data. Regeneration is deterministic: rebuilding a summary from its raw input
+reproduces the committed file byte-for-byte.
 
 ## Requirements
 
 Python 3 with numpy and matplotlib (see `requirements.txt`). Verified end to end
-with Python 3.13.1, numpy 2.2.0, matplotlib 3.10.0: all four figures build in
-about 2 seconds.
+with Python 3.13.1, numpy 2.2.0, matplotlib 3.10.0.
