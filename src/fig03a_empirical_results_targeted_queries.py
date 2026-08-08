@@ -66,7 +66,7 @@ ax.set_ylabel(r'Multiple of $\Lambda$', fontsize=fs)
 ax.set_xticks(x + width, pql, fontsize=fs-3)
 ylim = 11
 ax.set_yticks(tuple(i+1 for i in range(ylim-1)), tuple(i+1 for i in range(ylim-1)), fontsize=fs)
-ax.legend(loc='upper left', fontsize=fs)
+ax.legend(loc='upper left', fontsize=fs * 0.875)  # matches fig05's label:legend ratio (16:14)
 ax.set_ylim(0, ylim)
 
 plt.savefig('fig03a_empirical_results_targeted_queries.pdf')
