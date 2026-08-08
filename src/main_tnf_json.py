@@ -9,8 +9,6 @@ from parser import Parser
 
 
 
-
-
 def VariableListToJSON(num_vars):
     s = "["
     for i in range(num_vars):
@@ -60,7 +58,27 @@ p_q = [0.125, 0.175, 0.225, 0.275, 0.325, 0.375, 0.425, 0.475, 0.48, 0.485, 0.49
 p_r = [0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5, 0.5]
 
 
+GENERATE_TNF = True
+GENERATE_CNF = True
 
+if len(sys.argv) > 1:
+    if "t" not in sys.argv[1]:
+        GENERATE_TNF = False
+    if "c" not in sys.argv[1]:
+        GENERATE_CNF = False
+    print("Command line arguments received.")
+    if GENERATE_TNF and GENERATE_CNF:
+        print("Generating both TNF and CNF.")
+    else:
+        if GENERATE_TNF:
+            print("Generating TNF only.")
+        elif GENERATE_CNF:
+            print("Generating CNF only.")
+        else:
+            print("No intelligible generation request given. Aborting.")
+            exit(1)
+else:
+    print("No command line arguments received. Generating both TNF and CNF")
 
 test_set_num = 0
 for i in range(len(p_s)):
@@ -97,108 +115,113 @@ for i in range(len(p_s)):
         #rcvr_informed_false_set = receiver_truth_set.getSetDiff(query_truth_set)
         rcvr_informed_false_set = query_false_set.getSetDiff(receiver_false_set)
 
-        sender_tnf = TNF(trueSet=sender_truth_set)
-        sender_tnf_postfix = Parser(sender_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        neg_sender_tnf = TNF(trueSet=None, falseSet=sender_false_set)
-        neg_sender_tnf_postfix = Parser(neg_sender_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if len(neg_sender_tnf_postfix) < len(sender_tnf_postfix):
-            sender_tnf_postfix = neg_sender_tnf_postfix
+        if GENERATE_TNF:
+            sender_tnf = TNF(trueSet=sender_truth_set)
+            sender_tnf_postfix = Parser(sender_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            neg_sender_tnf = TNF(trueSet=None, falseSet=sender_false_set)
+            neg_sender_tnf_postfix = Parser(neg_sender_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if len(neg_sender_tnf_postfix) < len(sender_tnf_postfix):
+                sender_tnf_postfix = neg_sender_tnf_postfix
 
-        #sender_cnf = CNF.TightCNFFromTruthSet(sender_truth_set)
-        sender_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=sender_truth_set, min_width=MIN_WIDTH,
-                                                 max_width=MAX_WIDTH)
-        sender_cnf_string = sender_cnf.toString()
-        sender_cnf_postfix = Parser(sender_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if not test_rev_polish(sender_tnf_postfix):
+                print ("PROBLEM WITH sender_tnf!!")
+                exit(1)
+            if not DEBUG_ASSIST:
+                print("\"Sender TNF\": ")
+            else:
+                print("Sender TNF: (# Zeroes = " + str(len(sender_truth_set._set)) + ")")
+            print("\"" + sender_tnf_postfix + "\",")
 
-        if not test_rev_polish(sender_tnf_postfix):
-            print ("PROBLEM WITH sender_tnf!!")
-            exit(1)
-        if not DEBUG_ASSIST:
-            print("\"Sender TNF\": ")
-        else:
-            print("Sender TNF: (# Zeroes = " + str(len(sender_truth_set._set)) + ")")
-        print("\"" + sender_tnf_postfix + "\",")
-        if not test_rev_polish(sender_cnf_postfix):
-            print ("PROBLEM WITH sender_cnf!!")
-            exit(1)
-        print("\"Sender CNF\": ")
-        print("\"" + sender_cnf_postfix + "\",")
+        if GENERATE_CNF:
+            #sender_cnf = CNF.TightCNFFromTruthSet(sender_truth_set)
+            sender_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=sender_truth_set, min_width=MIN_WIDTH,
+                                                     max_width=MAX_WIDTH)
+            sender_cnf_string = sender_cnf.toString()
+            sender_cnf_postfix = Parser(sender_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
+
+            if not test_rev_polish(sender_cnf_postfix):
+                print ("PROBLEM WITH sender_cnf!!")
+                exit(1)
+            print("\"Sender CNF\": ")
+            print("\"" + sender_cnf_postfix + "\",")
+
         print("\"Sender Zeroes\": ")
         print(sender_truth_set.toJSON() + ",")
 
-        #query_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=query_truth_set, min_width=MIN_WIDTH,
-        #                                                     max_width=MAX_WIDTH)
-        query_tnf = TNF(trueSet=query_truth_set)
-        query_tnf_postfix = Parser(query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        neg_query_tnf = TNF(trueSet=None, falseSet=query_false_set)
-        neg_query_tnf_postfix = Parser(neg_query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if len(neg_query_tnf_postfix) < len(query_tnf_postfix):
-            query_tnf_postfix = neg_query_tnf_postfix
+        if GENERATE_TNF:
+            query_tnf = TNF(trueSet=query_truth_set)
+            query_tnf_postfix = Parser(query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            neg_query_tnf = TNF(trueSet=None, falseSet=query_false_set)
+            neg_query_tnf_postfix = Parser(neg_query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if len(neg_query_tnf_postfix) < len(query_tnf_postfix):
+                query_tnf_postfix = neg_query_tnf_postfix
 
-        if not test_rev_polish(query_tnf_postfix):
-            print ("PROBLEM WITH query_tnf!!")
-            exit(1)
-        if not DEBUG_ASSIST:
-            print("\"Query TNF\": ")
-        else:
-            print("Query TNF: (# Zeroes = " + str(len(query_truth_set._set)) + ")")
-        #print("\"" + query_tnf._tnf + "\",")
-        print("\"" + query_tnf_postfix + "\",")
+            if not test_rev_polish(query_tnf_postfix):
+                print ("PROBLEM WITH query_tnf!!")
+                exit(1)
+            if not DEBUG_ASSIST:
+                print("\"Query TNF\": ")
+            else:
+                print("Query TNF: (# Zeroes = " + str(len(query_truth_set._set)) + ")")
+            #print("\"" + query_tnf._tnf + "\",")
+            print("\"" + query_tnf_postfix + "\",")
+
+
+            rcvr_informed_query_tnf = TNF(trueSet=None, falseSet=rcvr_informed_false_set)
+            rcvr_informed_query_tnf_postfix = Parser(rcvr_informed_query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if not test_rev_polish(rcvr_informed_query_tnf_postfix):
+                print ("PROBLEM WITH rcvr_informed_query_tnf!!")
+                exit(1)
+            if not DEBUG_ASSIST:
+                print("\"Receiver Informed Query TNF\": ")
+            else:
+                print("Receiver Informed Query TNF: (# Ones = " + str(len(rcvr_informed_false_set._set)) + ")")
+            # print("\"" + rcvr_informed_query_tnf._tnf + "\",")
+            print("\"" + rcvr_informed_query_tnf_postfix + "\",")
+
+        if GENERATE_CNF:
+            #query_cnf = CNF.TightCNFFromTruthSet(query_truth_set)
+            query_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=query_truth_set, min_width=MIN_WIDTH,
+                                                                  max_width=MAX_WIDTH)
+            query_cnf_string = query_cnf.toString()
+            query_cnf_postfix = Parser(query_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if not test_rev_polish(query_cnf_postfix):
+                print ("PROBLEM WITH query_cnf!!")
+                exit(1)
+            print("\"Query CNF\": ")
+            print("\"" + query_cnf_postfix + "\",")
+
         print("\"Query Zeroes\": ")
         print(query_truth_set.toJSON() + ",")
 
-        rcvr_informed_query_tnf = TNF(trueSet=None, falseSet=rcvr_informed_false_set)
-        rcvr_informed_query_tnf_postfix = Parser(rcvr_informed_query_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if not test_rev_polish(rcvr_informed_query_tnf_postfix):
-            print ("PROBLEM WITH rcvr_informed_query_tnf!!")
-            exit(1)
-        if not DEBUG_ASSIST:
-            print("\"Receiver Informed Query TNF\": ")
-        else:
-            print("Receiver Informed Query TNF: (# Ones = " + str(len(rcvr_informed_false_set._set)) + ")")
-        # print("\"" + rcvr_informed_query_tnf._tnf + "\",")
-        print("\"" + rcvr_informed_query_tnf_postfix + "\",")
+        if GENERATE_TNF:
+            receiver_tnf = TNF(trueSet=receiver_truth_set)
+            receiver_tnf_postfix = Parser(receiver_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            neg_receiver_tnf = TNF(trueSet=None, falseSet=query_false_set)
+            neg_receiver_tnf_postfix = Parser(neg_receiver_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if len(neg_receiver_tnf_postfix) < len(receiver_tnf_postfix):
+                receiver_tnf_postfix = neg_receiver_tnf_postfix
 
-        #query_cnf = CNF.TightCNFFromTruthSet(query_truth_set)
-        query_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=query_truth_set, min_width=MIN_WIDTH,
-                                                              max_width=MAX_WIDTH)
-        query_cnf_string = query_cnf.toString()
-        query_cnf_postfix = Parser(query_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if not test_rev_polish(query_cnf_postfix):
-            print ("PROBLEM WITH query_cnf!!")
-            exit(1)
-        print("\"Query CNF\": ")
-        print("\"" + query_cnf_postfix + "\",")
+            if not test_rev_polish(receiver_tnf_postfix):
+                print ("PROBLEM WITH receiver_tnf!!")
+                exit(1)
+            if not DEBUG_ASSIST:
+                print("\"Receiver TNF\": ")
+            else:
+                print("Receiver TNF: (# Zeroes = " + str(len(receiver_truth_set._set)) + ")")
+            #print("\"" + receiver_tnf._tnf + "\",")
+            print("\"" + receiver_tnf_postfix + "\",")
 
-        #receiver_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=receiver_truth_set, min_width=MIN_WIDTH,
-        #                                                        max_width=MAX_WIDTH)
-        receiver_tnf = TNF(trueSet=receiver_truth_set)
-        receiver_tnf_postfix = Parser(receiver_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        neg_receiver_tnf = TNF(trueSet=None, falseSet=query_false_set)
-        neg_receiver_tnf_postfix = Parser(neg_receiver_tnf._tnf).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if len(neg_receiver_tnf_postfix) < len(receiver_tnf_postfix):
-            receiver_tnf_postfix = neg_receiver_tnf_postfix
-
-        if not test_rev_polish(receiver_tnf_postfix):
-            print ("PROBLEM WITH receiver_tnf!!")
-            exit(1)
-        if not DEBUG_ASSIST:
-            print("\"Receiver TNF\": ")
-        else:
-            print("Receiver TNF: (# Zeroes = " + str(len(receiver_truth_set._set)) + ")")
-        #print("\"" + receiver_tnf._tnf + "\",")
-        print("\"" + receiver_tnf_postfix + "\",")
-
-        #receiver_cnf = CNF.TightCNFFromTruthSet(receiver_truth_set)
-        receiver_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=receiver_truth_set, min_width=MIN_WIDTH,
-                                                             max_width=MAX_WIDTH)
-        receiver_cnf_string = receiver_cnf.toString()
-        receiver_cnf_postfix = Parser(receiver_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
-        if not test_rev_polish(receiver_cnf_postfix):
-            print("PROBLEM WITH receiver_cnf!!")
-            exit(1)
-        print("\"Receiver CNF\": ")
-        print("\"" + receiver_cnf_postfix + "\",")
+        if GENERATE_CNF:
+            receiver_cnf = CNF.BuildRandomWidthCNFWithGivenTruthSet(truth_set=receiver_truth_set, min_width=MIN_WIDTH,
+                                                                 max_width=MAX_WIDTH)
+            receiver_cnf_string = receiver_cnf.toString()
+            receiver_cnf_postfix = Parser(receiver_cnf_string).toPostfix(terseness=Parser.ULTRA_TERSE)
+            if not test_rev_polish(receiver_cnf_postfix):
+                print("PROBLEM WITH receiver_cnf!!")
+                exit(1)
+            print("\"Receiver CNF\": ")
+            print("\"" + receiver_cnf_postfix + "\",")
 
         print("\"Receiver Zeroes\": ")
         print(receiver_truth_set.toJSON())
