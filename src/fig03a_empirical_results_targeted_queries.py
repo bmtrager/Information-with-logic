@@ -69,4 +69,4 @@ ax.set_yticks(tuple(i+1 for i in range(ylim-1)), tuple(i+1 for i in range(ylim-1
 ax.legend(loc='upper left', fontsize=fs)
 ax.set_ylim(0, ylim)
 
-plt.savefig('fig03a_empirical_results_targeted_queries.png')
+plt.savefig('fig03a_empirical_results_targeted_queries.pdf')

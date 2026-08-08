@@ -68,4 +68,4 @@ ax.legend(loc='lower left', fontsize=14)
 
 plt.xticks(fontsize=16)
 plt.yticks(fontsize=16)
-plt.savefig('fig05a_methods_targeted_queries.png', dpi=300, bbox_inches='tight')
+plt.savefig('fig05a_methods_targeted_queries.pdf', bbox_inches='tight')

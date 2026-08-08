@@ -12,7 +12,7 @@ pip install -r requirements.txt
 python3 make_figures.py
 ```
 
-PNGs are written to `figures/`. To build a subset, pass figure keys:
+Vector PDFs are written to `figures/`. To build a subset, pass figure keys:
 
 ```bash
 python3 make_figures.py fig03a fig05a
@@ -26,20 +26,20 @@ summaries came from are also included; re-deriving them is a separate step — s
 
 Four figures are generated, each rendered with matplotlib:
 
-| Key | Output PNG | Paper figure |
+| Key | Output PDF | Paper figure |
 | --- | --- | --- |
-| `fig03a` | `fig03a_empirical_results_targeted_queries.png` | Fig. 3(a) — empirical results, targeted queries |
-| `fig03b` | `fig03b_empirical_results_no_need_to_know.png` | Fig. 3(b) — empirical results, no need to know |
-| `fig05a` | `fig05a_methods_targeted_queries.png` | Fig. 5(a) — methods, targeted queries |
-| `fig05b` | `fig05b_methods_no_need_to_know.png` | Fig. 5(b) — methods, no need to know |
+| `fig03a` | `fig03a_empirical_results_targeted_queries.pdf` | Fig. 3(a) — empirical results, targeted queries |
+| `fig03b` | `fig03b_empirical_results_no_need_to_know.pdf` | Fig. 3(b) — empirical results, no need to know |
+| `fig05a` | `fig05a_methods_targeted_queries.pdf` | Fig. 5(a) — methods, targeted queries |
+| `fig05b` | `fig05b_methods_no_need_to_know.pdf` | Fig. 5(b) — methods, no need to know |
 
-The paper's LaTeX embeds the `.pdf` version of each figure; the `.png` files are
-the same plots in raster form.
+The paper's LaTeX embeds this same `.pdf` file directly (vector graphics, no
+rasterization).
 
 ## Layout
 
 ```
-make_figures.py   driver: runs each plot script and collects its PNG
+make_figures.py   driver: runs each plot script and collects its PDF
 src/              plot scripts, encoder/analysis modules, and the summary drivers
 data/             raw per-experiment test sets + the summary JSON derived from them
 figures/          build output

@@ -2,8 +2,8 @@
 """Regenerate the computed figures.
 
 Each figure script is run with `src/` as the working directory (they resolve
-their input data as "../data/..." and write their PNG into the CWD), then the
-resulting PNG is moved into `figures/`.
+their input data as "../data/..." and write their vector PDF into the CWD),
+then the resulting PDF is moved into `figures/`.
 
 Usage:
     python3 make_figures.py            # build all figures
@@ -19,7 +19,7 @@ ROOT = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(ROOT, "src")
 OUT = os.path.join(ROOT, "figures")
 
-# key -> (script in src/, PNG the script writes)
+# key -> (script in src/, PDF the script writes)
 #
 # Keys are the figure labels used in the paper:
 #   fig03a / fig03b  -> Fig. 3, panels (a) and (b): empirical results
@@ -27,30 +27,30 @@ OUT = os.path.join(ROOT, "figures")
 FIGURES = {
     "fig03a": (
         "fig03a_empirical_results_targeted_queries.py",
-        "fig03a_empirical_results_targeted_queries.png",
+        "fig03a_empirical_results_targeted_queries.pdf",
     ),
     "fig03b": (
         "fig03b_empirical_results_no_need_to_know.py",
-        "fig03b_empirical_results_no_need_to_know.png",
+        "fig03b_empirical_results_no_need_to_know.pdf",
     ),
     "fig05a": (
         "fig05a_methods_targeted_queries.py",
-        "fig05a_methods_targeted_queries.png",
+        "fig05a_methods_targeted_queries.pdf",
     ),
     "fig05b": (
         "fig05b_methods_no_need_to_know.py",
-        "fig05b_methods_no_need_to_know.png",
+        "fig05b_methods_no_need_to_know.pdf",
     ),
 }
 
 
 def build(key):
-    script, png = FIGURES[key]
+    script, pdf = FIGURES[key]
     print(f"[{key}] running src/{script} ...")
     subprocess.run([sys.executable, script], cwd=SRC, check=True)
     os.makedirs(OUT, exist_ok=True)
-    shutil.move(os.path.join(SRC, png), os.path.join(OUT, png))
-    print(f"[{key}] wrote figures/{png}")
+    shutil.move(os.path.join(SRC, pdf), os.path.join(OUT, pdf))
+    print(f"[{key}] wrote figures/{pdf}")
 
 
 def main(argv):
